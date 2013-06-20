@@ -15,30 +15,14 @@ public class TestProvider implements ITestsRunnerProvider {
 	@Override
 	public String[] getAdditionalLaunchParameters(String[][] testPaths)
 			throws TestingException {
-		// TODO Auto-generated method stub
-		return null;
+		final String [] result = {"-v"}; 
+		return result;
 	}
 
 	@Override
 	public void run(ITestModelUpdater modelUpdater, InputStream inputStream)
 			throws TestingException {
-		// TODO Auto-generated method stub
-		InputStreamReader streamReader = new InputStreamReader(inputStream);
-		BufferedReader reader = new BufferedReader(streamReader);
-        String line;
-        try {
-			while ( ( line = reader.readLine() ) != null ) {
-				if(line.startsWith("Error")){
-					modelUpdater.enterTestCase("ErrorTestCase");
-					modelUpdater.setTestStatus(ITestItem.Status.Failed);
-					modelUpdater.exitTestCase();
-				}
-			}
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-        
+		CppUTestStatusUpdater testStatusUpdater = new CppUTestStatusUpdater(inputStream, modelUpdater);
+		testStatusUpdater.updateStatus();
 	}
-
 }
