@@ -22,7 +22,7 @@ public class TestProvider implements ITestsRunnerProvider {
 	@Override
 	public void run(ITestModelUpdater modelUpdater, InputStream inputStream)
 			throws TestingException {
-		CppUTestStatusUpdater testStatusUpdater = new CppUTestStatusUpdater(inputStream, modelUpdater);
+		StatusReporter testStatusUpdater = new StatusReporter(inputStream, modelUpdater);
 		testStatusUpdater.updateStatus();
 	}
 }
