@@ -3,7 +3,7 @@ package org.sharon.cpputest;
 import org.eclipse.cdt.testsrunner.model.ITestItem;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 
-public class TestCaseResultParser {
+public class TestCaseResultParser implements TestCaseResult {
 	private String testCaseName;
 	static int testCaseNumber;
 
@@ -16,10 +16,10 @@ public class TestCaseResultParser {
 			testCaseName = line.replaceAll(pattern, namePositionInPattern);
 	}
 
-	public void putTo(ITestModelUpdater updater) {
+	public void putTo(ITestModelUpdater dashBoard) {
 		if (testCaseName.equals("")) return;
-		updater.enterTestCase(testCaseName);
-		updater.setTestStatus(ITestItem.Status.Passed);
-		updater.exitTestCase();
+		dashBoard.enterTestCase(testCaseName);
+		dashBoard.setTestStatus(ITestItem.Status.Passed);
+		dashBoard.exitTestCase();
 	}
 }

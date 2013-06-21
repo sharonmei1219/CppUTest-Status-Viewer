@@ -20,9 +20,9 @@ public class TestProvider implements ITestsRunnerProvider {
 	}
 
 	@Override
-	public void run(ITestModelUpdater modelUpdater, InputStream inputStream)
+	public void run(ITestModelUpdater dashBoard, InputStream testResultInStream)
 			throws TestingException {
-		StatusReporter testStatusUpdater = new StatusReporter(inputStream, modelUpdater);
-		testStatusUpdater.updateStatus();
+		Reporter reporter = new Reporter(dashBoard, testResultInStream);
+		reporter.reportTestResult();
 	}
 }
