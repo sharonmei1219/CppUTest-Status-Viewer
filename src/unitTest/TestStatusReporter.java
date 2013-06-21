@@ -18,15 +18,15 @@ public class TestStatusReporter {
 	@Test
 	public void testSuccessParseStream() {
 		final ITestModelUpdater testDashBoard = context.mock(ITestModelUpdater.class);
-		byte[] cppUTestOutputByte = "TEST(testSuit, \"\", ...)\nTEST(testSuit, \"\")...".getBytes();
+		byte[] cppUTestOutputByte = "TEST(testSuite, testCase1),... \nTEST(testSuite, testCase2)...".getBytes();
 		InputStream outputStream = new ByteArrayInputStream(cppUTestOutputByte);
 		Reporter testStatusUpdater = new Reporter(testDashBoard, outputStream);
 		context.checking(new Expectations(){
 			{
-				oneOf(testDashBoard).enterTestCase(with(any(String.class)));
+				oneOf(testDashBoard).enterTestCase("testCase1");
 				oneOf(testDashBoard).setTestStatus(ITestItem.Status.Passed);
 				oneOf(testDashBoard).exitTestCase();
-				oneOf(testDashBoard).enterTestCase(with(any(String.class)));
+				oneOf(testDashBoard).enterTestCase("testCase2");
 				oneOf(testDashBoard).setTestStatus(ITestItem.Status.Passed);
 				oneOf(testDashBoard).exitTestCase();
 			}
