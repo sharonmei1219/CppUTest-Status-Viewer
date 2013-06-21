@@ -8,12 +8,15 @@ import java.io.InputStreamReader;
 import org.eclipse.cdt.testsrunner.model.ITestItem;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 
+
 public class Reporter {
 
 	private InputStream testResultStream;
 	private ITestModelUpdater testDashBoard;
+	private TestCaseFactory testCaseFactory;
 
-	public Reporter(ITestModelUpdater unitTestDashBoard, InputStream testResultStreamFromConsole) {
+	public Reporter(ITestModelUpdater unitTestDashBoard, InputStream testResultStreamFromConsole, TestCaseFactory factory) {
+		this.testCaseFactory = factory;
 		this.testResultStream = testResultStreamFromConsole;
 		this.testDashBoard = unitTestDashBoard;
 	}
@@ -26,8 +29,9 @@ public class Reporter {
         
         try {
 			while ( ( line = reader.readLine() ) != null ) {
-				TestCaseResult testCaseResult = new TestCaseResultParser(line);
-				testCaseResult.putTo(testDashBoard);
+				TestCaseResult tcResult = testCaseFactory.createTestCase(line);
+				if (tcResult.needMoreInfo() == false)
+					tcResult.putTo(testDashBoard);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

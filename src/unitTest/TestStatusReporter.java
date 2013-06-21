@@ -9,6 +9,8 @@ import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
 import org.sharon.cpputest.Reporter;
+import org.sharon.cpputest.TestCaseFactory;
+import org.sharon.cpputest.TestCaseResult;
 import org.eclipse.cdt.testsrunner.model.ITestItem;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 public class TestStatusReporter {
@@ -18,20 +20,36 @@ public class TestStatusReporter {
 	@Test
 	public void testSuccessParseStream() {
 		final ITestModelUpdater testDashBoard = context.mock(ITestModelUpdater.class);
-		byte[] cppUTestOutputByte = "TEST(testSuite, testCase1),... \nTEST(testSuite, testCase2)...".getBytes();
-		InputStream outputStream = new ByteArrayInputStream(cppUTestOutputByte);
-		Reporter testStatusUpdater = new Reporter(testDashBoard, outputStream);
+		final TestCaseFactory factory = context.mock(TestCaseFactory.class);
+		InputStream testResultStream = buildTestResultStream("TEST(testSuite, testCase1),... \nTEST(testSuite, testCase2)...");
+		Reporter testStatusUpdater = new Reporter(testDashBoard, testResultStream, factory);
+
+		final TestCaseResult testCase_1 = context.mock(TestCaseResult.class, "firstCase");
+		final TestCaseResult testCase_2 = context.mock(TestCaseResult.class, "secondCase");
+
 		context.checking(new Expectations(){
 			{
-				oneOf(testDashBoard).enterTestCase("testCase1");
-				oneOf(testDashBoard).setTestStatus(ITestItem.Status.Passed);
-				oneOf(testDashBoard).exitTestCase();
-				oneOf(testDashBoard).enterTestCase("testCase2");
-				oneOf(testDashBoard).setTestStatus(ITestItem.Status.Passed);
-				oneOf(testDashBoard).exitTestCase();
+				oneOf(factory).createTestCase("TEST(testSuite, testCase1),... "); 
+				will(returnValue(testCase_1));
+				oneOf(testCase_1).needMoreInfo();
+				will(returnValue(false));
+				oneOf(testCase_1).putTo(testDashBoard);
+				
+				oneOf(factory).createTestCase("TEST(testSuite, testCase2)..."); 
+				will(returnValue(testCase_2));
+				oneOf(testCase_2).needMoreInfo();
+				will(returnValue(false));
+				oneOf(testCase_2).putTo(testDashBoard);
 			}
 		});
+		
 		testStatusUpdater.reportTestResult();
 		context.assertIsSatisfied();
+	}
+
+	private InputStream buildTestResultStream(String testResult) {
+		byte[] cppUTestOutputByte = testResult.getBytes();
+		InputStream testResultStream = new ByteArrayInputStream(cppUTestOutputByte);
+		return testResultStream;
 	}
 }
