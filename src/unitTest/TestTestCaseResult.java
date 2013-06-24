@@ -68,6 +68,7 @@ public class TestTestCaseResult {
 			{
 				oneOf(updater).enterTestCase("TestFail");
 				oneOf(updater).setTestStatus(ITestItem.Status.Failed);
+				oneOf(updater).addTestMessage("", 0, ITestMessage.Level.Error, "Error: not implemented");
 				oneOf(updater).setTestingTime(5);
 				oneOf(updater).exitTestCase();
 			}
@@ -78,32 +79,7 @@ public class TestTestCaseResult {
 	}
 	
 	@Test
-	public void funnyOne(){
-
-//		TEST(TestTimerCommandParser, parseExpireTime) - 0 ms
-		TestCaseFactory factory = new TestCaseFactoryImp();
-		String line = "TEST(TestTimerCommandParser, parseAction)";
-		TestCaseResult tcResult = factory.createTestCase(line);
-		tcResult.read("test/testCmdLineParser.cpp:37: error: Failure in TEST(TestTimerCommandParser, parseAction)");
-		tcResult.read("        expected <1>");
-		tcResult.read("        but was  <0>");
-		tcResult.read("        difference starts at position 0 at: <          0         >");
-		tcResult.read("                                                       ^");
-		tcResult.read("");
-		tcResult.read(" - 0 ms");
-		
-		assertFalse(tcResult.needMoreInfo());
-		
-		context.checking(new Expectations(){
-			{
-				oneOf(updater).enterTestCase("parseAction");
-				oneOf(updater).setTestStatus(ITestItem.Status.Failed);
-				oneOf(updater).setTestingTime(0);
-				oneOf(updater).exitTestCase();
-			}
-		});
-		
-		tcResult.putTo(updater);
-		context.assertIsSatisfied();
+	public void testendofline(){
+		System.out.println("line 1" + "\r\n" + "line 2");
 	}
 }

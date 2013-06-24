@@ -1,6 +1,10 @@
 package org.sharon.cpputest;
+import java.text.MessageFormat;
+import java.util.ArrayList;
 
+import org.eclipse.cdt.testsrunner.model.ITestCase;
 import org.eclipse.cdt.testsrunner.model.ITestItem;
+import org.eclipse.cdt.testsrunner.model.ITestMessage;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 
 public class TestCaseResultImp implements TestCaseResult {
@@ -10,6 +14,7 @@ public class TestCaseResultImp implements TestCaseResult {
 	private boolean testInfoComplete;
 	private int testingTime;
 	ITestItem.Status testingStatus;
+	ArrayList <String> errorMessage = new ArrayList <String>();
 	
 	public TestCaseResultImp(String line) {
 		testingStatus = ITestItem.Status.Passed;
@@ -21,6 +26,11 @@ public class TestCaseResultImp implements TestCaseResult {
 	public void putTo(ITestModelUpdater dashBoard) {
 		dashBoard.enterTestCase(testCaseName);
 		dashBoard.setTestStatus(testingStatus);
+		if(testingStatus == ITestItem.Status.Failed){
+			dashBoard.addTestMessage("", 0, ITestMessage.Level.Error, errorMessage.get(0));
+			for (int i = 1; i < errorMessage.size(); i++)
+				dashBoard.addTestMessage("", 0, ITestMessage.Level.Message, errorMessage.get(i));
+		}
 		dashBoard.setTestingTime(testingTime);
 		dashBoard.exitTestCase();
 	}
@@ -34,7 +44,11 @@ public class TestCaseResultImp implements TestCaseResult {
 	public void read(String line) {
 		testingStatus = ITestItem.Status.Failed;
 		testInfoComplete = isCaseInfoComplete(line);
-		testingTime = extractTestingTime(line);
+		
+		if(!testInfoComplete)
+			errorMessage.add(line);
+		else
+			testingTime = extractTestingTime(line);
 	}
 	
 	private int extractTestingTime(String line) {
