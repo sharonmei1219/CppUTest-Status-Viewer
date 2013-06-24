@@ -7,31 +7,34 @@ public class TestCaseResultImp implements TestCaseResult {
 	
 	private String testCaseName;
 	static int testCaseNumber;
-	private boolean caseInfoComplete;
+	private boolean testInfoComplete;
 	private int testingTime;
+	ITestItem.Status testingStatus;
 	
 	public TestCaseResultImp(String line) {
+		testingStatus = ITestItem.Status.Passed;
 		testCaseName = extractTestCaseName(line);
-		caseInfoComplete = isCaseInfoComplete(line);
+		testInfoComplete = isCaseInfoComplete(line);
 		testingTime = extractTestingTime(line);
 	}
 
 	public void putTo(ITestModelUpdater dashBoard) {
-		if (testCaseName.equals("")) return;
 		dashBoard.enterTestCase(testCaseName);
-		dashBoard.setTestStatus(ITestItem.Status.Passed);
+		dashBoard.setTestStatus(testingStatus);
 		dashBoard.setTestingTime(testingTime);
 		dashBoard.exitTestCase();
 	}
 
 	@Override
 	public boolean needMoreInfo() {
-		return !caseInfoComplete;
+		return !testInfoComplete;
 	}
 
 	@Override
 	public void read(String line) {
-		caseInfoComplete = isCaseInfoComplete(line);
+		testingStatus = ITestItem.Status.Failed;
+		testInfoComplete = isCaseInfoComplete(line);
+		testingTime = extractTestingTime(line);
 	}
 	
 	private int extractTestingTime(String line) {
@@ -43,11 +46,7 @@ public class TestCaseResultImp implements TestCaseResult {
 	}
 	
 	private String extractTestCaseName(String line) {
-		String pattern = "(.*)(TEST\\()(.*)(, )(.*)(\\)\\W)(.*)";
-		
-		if(line.matches(pattern) != true)
-			return "";
-
+		String pattern = "(.*)(TEST\\()(.*)(, )(.*)(\\))(.*)";
 		return line.replaceAll(pattern, "$5");
 
 	}

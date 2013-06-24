@@ -8,7 +8,6 @@ import java.io.InputStreamReader;
 import org.eclipse.cdt.testsrunner.model.ITestItem;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 
-
 public class Reporter {
 
 	private InputStream testResultStream;
@@ -30,8 +29,10 @@ public class Reporter {
         try {
 			while ( ( line = reader.readLine() ) != null ) {
 				TestCaseResult tcResult = testCaseFactory.createTestCase(line);
-				if (tcResult.needMoreInfo() == false)
-					tcResult.putTo(testDashBoard);
+				while( (tcResult.needMoreInfo()) && (line = reader.readLine()) != null){
+					tcResult.read(line);
+				}
+				tcResult.putTo(testDashBoard);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

@@ -16,11 +16,11 @@ import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 public class TestStatusReporter {
 	
 	Mockery context = new Mockery();
+	final ITestModelUpdater testDashBoard = context.mock(ITestModelUpdater.class);
+	final TestCaseFactory factory = context.mock(TestCaseFactory.class);
 
 	@Test
 	public void testSuccessParseStream() {
-		final ITestModelUpdater testDashBoard = context.mock(ITestModelUpdater.class);
-		final TestCaseFactory factory = context.mock(TestCaseFactory.class);
 		InputStream testResultStream = buildTestResultStream("TEST(testSuite, testCase1),... \nTEST(testSuite, testCase2)...");
 		Reporter testStatusUpdater = new Reporter(testDashBoard, testResultStream, factory);
 
@@ -45,6 +45,31 @@ public class TestStatusReporter {
 		
 		testStatusUpdater.reportTestResult();
 		context.assertIsSatisfied();
+	}
+	
+	@Test
+	public void testInfoMoreThanTwoLines(){
+		InputStream testResultStream = buildTestResultStream("line1 \nline2 ");
+		Reporter testStatusUpdater = new Reporter(testDashBoard, testResultStream, factory);
+		final TestCaseResult testCase = context.mock(TestCaseResult.class, "firstCase");
+		
+		context.checking(new Expectations(){
+			{
+				oneOf(factory).createTestCase("line1 "); 
+				will(returnValue(testCase));
+				oneOf(testCase).needMoreInfo();
+				will(returnValue(true));
+				oneOf(testCase).read("line2 ");
+				oneOf(testCase).needMoreInfo();
+				will(returnValue(false));
+				oneOf(testCase).putTo(testDashBoard);
+				
+			}
+		});
+		
+		testStatusUpdater.reportTestResult();
+		context.assertIsSatisfied();
+		
 	}
 
 	private InputStream buildTestResultStream(String testResult) {
