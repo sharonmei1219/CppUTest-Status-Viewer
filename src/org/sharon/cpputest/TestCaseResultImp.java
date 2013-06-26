@@ -27,12 +27,30 @@ public class TestCaseResultImp implements TestCaseResult {
 		dashBoard.enterTestCase(testCaseName);
 		dashBoard.setTestStatus(testingStatus);
 		if(testingStatus == ITestItem.Status.Failed){
-			dashBoard.addTestMessage("", 0, ITestMessage.Level.Error, errorMessage.get(0));
+			String errorInfo = errorMessage.get(0);
+			String fileName = extractFileName(errorInfo);
+			int lineNumber = extractLineNumber(errorInfo);
+			dashBoard.addTestMessage(fileName, lineNumber, ITestMessage.Level.Error, errorMessage.get(0));
 			for (int i = 1; i < errorMessage.size(); i++)
 				dashBoard.addTestMessage("", 0, ITestMessage.Level.Message, errorMessage.get(i));
 		}
 		dashBoard.setTestingTime(testingTime);
 		dashBoard.exitTestCase();
+	}
+	
+
+	private int extractLineNumber(String errorInfo) {
+		String pattern = "(.*)(:)([0-9]*)(: error:.*)";
+		if(errorInfo.matches(pattern))
+			return Integer.parseInt(errorInfo.replaceAll(pattern, "$3"));
+		return 0;
+	}
+
+	private String extractFileName(String errorInfo) {
+		String pattern = "(.*)(:)([0-9]*)(: error:.*)";
+		if (errorInfo.matches(pattern))
+			return errorInfo.replaceAll(pattern, "$1");
+		return "";
 	}
 
 	@Override

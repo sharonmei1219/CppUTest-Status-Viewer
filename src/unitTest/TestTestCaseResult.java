@@ -61,14 +61,15 @@ public class TestTestCaseResult {
 	public void testReportFailedTestCase(){
 		
 		TestCaseResult testCaseResult = new TestCaseResultImp(beginningLineOfFailedCase);
-		testCaseResult.read("Error: not implemented");
+		final String errorInfo = "test/testTimer.cpp:40: error: Failure in TEST(TestTimer, testTimerExpired)";
+		final String fileName = "test/testTimer.cpp";
+		testCaseResult.read(errorInfo);
 		testCaseResult.read(" - 5 ms");
-		
 		context.checking(new Expectations(){
 			{
 				oneOf(updater).enterTestCase("TestFail");
 				oneOf(updater).setTestStatus(ITestItem.Status.Failed);
-				oneOf(updater).addTestMessage("", 0, ITestMessage.Level.Error, "Error: not implemented");
+				oneOf(updater).addTestMessage(fileName, 40, ITestMessage.Level.Error, errorInfo);
 				oneOf(updater).setTestingTime(5);
 				oneOf(updater).exitTestCase();
 			}
@@ -79,7 +80,18 @@ public class TestTestCaseResult {
 	}
 	
 	@Test
-	public void testendofline(){
-		System.out.println("line 1" + "\r\n" + "line 2");
+	public void testRegularExpression(){
+		
+		String line = "test/testTimer.cpp:40: error: Failure in TEST(TestTimer, testTimerExpired)";
+		String pattern = "(.*)(:)([0-9]*)(: error:.*)";
+		String fileName = line.replaceAll(pattern, "$1");
+		assertTrue(line.matches(pattern));
+		assertEquals(fileName, "test/testTimer.cpp");
+		assertEquals(Integer.parseInt(line.replaceAll(pattern, "$3")), 40);
+		
+		String splitedName[] = fileName.split("/");
+		String neatFileName = splitedName[splitedName.length-1];
+		assertEquals(neatFileName, "testTimer.cpp");
+		
 	}
 }
