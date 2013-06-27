@@ -2,17 +2,13 @@ package org.sharon.cpputest;
 
 
 public class TestCaseFactoryImp implements TestCaseFactory {
+	CppUTestOutputParser parser = new CppUTestOutputParser();
 
 	@Override
 	public TestCaseResult createTestCase(String line) {
-		if (!cotainTestCaseName(line)){
-			return new NullTestCaseResult();
+		if (parser.cotainsTestCaseName(line)){
+			return new TestCaseResultImp(line);
 		}
-		return new TestCaseResultImp(line);
-	}
-
-	private boolean cotainTestCaseName(String line) {
-		String pattern = "(.*)(TEST\\()(.*)(, )(.*)(\\))(.*)";
-		return line.matches(pattern);
+		return new NullTestCaseResult();
 	}
 }

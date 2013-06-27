@@ -2,41 +2,40 @@ package org.sharon.cpputest;
 
 public class CppUTestOutputParser {
 
+	private String TestCaseTitlePattern = "(.*)(TEST\\()(.*)(, )(.*)(\\))(.*)";
+	private String TestingTimePattern = "(.*)( - )(.*)( ms)$";
+	private String ErrorInfoPattern = "(.*)(:)([0-9]*)(: error:)(.*)";
+
 	public String extractTestCaseName(String line) {
-		String pattern = "(.*)(TEST\\()(.*)(, )(.*)(\\))(.*)";
-		return line.replaceAll(pattern, "$5");
+		return line.replaceAll(TestCaseTitlePattern, "$5");
 	}
 
-	public int extractTestingTime(String line) {
-		String pattern = "(.*)( - )(.*)( ms)$";
-		if (line.matches(pattern)) {
-			return Integer.parseInt(line.replaceAll(pattern, "$3"));
-		}
-		return -1;
+	boolean cotainsTestCaseName(String line) {
+		return line.matches(TestCaseTitlePattern);
 	}
 
 	public boolean containsTestingTime(String line) {
-		String pattern = "(.*)( - )(.*)( ms)$";
-		return line.matches(pattern);
+		return line.matches(TestingTimePattern);
+	}
+
+	public int extractTestingTime(String line) {
+		return Integer.parseInt(line.replaceAll(TestingTimePattern, "$3"));
 	}
 
 	public boolean containsErrorInfo(String line) {
-		return line.matches("(.*)(:)([0-9]*)(: error:.*)");
+		return line.matches(ErrorInfoPattern);
 	}
 
 	public String extractError(String errorInfo) {
-		String pattern = "(.*)(:)([0-9]*)(: error:)(.*)";
-		return errorInfo.replaceAll(pattern, "$5");
+		return errorInfo.replaceAll(ErrorInfoPattern, "$5");
 	}
 
 	public int extractLineNumber(String errorInfo) {
-		String pattern = "(.*)(:)([0-9]*)(: error:.*)";
-		return Integer.parseInt(errorInfo.replaceAll(pattern, "$3"));
+		return Integer.parseInt(errorInfo.replaceAll(ErrorInfoPattern, "$3"));
 	}
 
 	public String extractFileName(String errorInfo) {
-		String pattern = "(.*)(:)([0-9]*)(: error:.*)";
-		return errorInfo.replaceAll(pattern, "$1");
+		return errorInfo.replaceAll(ErrorInfoPattern, "$1");
 	}
 
 }
