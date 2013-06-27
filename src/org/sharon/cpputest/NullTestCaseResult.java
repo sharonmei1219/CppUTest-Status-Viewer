@@ -14,7 +14,7 @@ public class NullTestCaseResult implements TestCaseResult {
 	}
 
 	@Override
-	public void addMoreInfo(String string) {
+	public void parseAdditionalLine(String string, CppUTestOutputParser parser) {
 	}
 
 }

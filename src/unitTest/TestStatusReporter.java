@@ -8,6 +8,7 @@ import java.io.InputStream;
 import org.jmock.Expectations;
 import org.jmock.Mockery;
 import org.junit.Test;
+import org.sharon.cpputest.CppUTestOutputParser;
 import org.sharon.cpputest.Reporter;
 import org.sharon.cpputest.TestCaseFactory;
 import org.sharon.cpputest.TestCaseResult;
@@ -17,12 +18,13 @@ public class TestStatusReporter {
 	
 	Mockery context = new Mockery();
 	final ITestModelUpdater testDashBoard = context.mock(ITestModelUpdater.class);
+	CppUTestOutputParser parser = new CppUTestOutputParser();
 	final TestCaseFactory factory = context.mock(TestCaseFactory.class);
 
 	@Test
 	public void testSuccessParseStream() {
 		InputStream testResultStream = buildTestResultStream("TEST(testSuite, testCase1),... \nTEST(testSuite, testCase2)...");
-		Reporter testStatusUpdater = new Reporter(testDashBoard, testResultStream, factory);
+		Reporter testStatusUpdater = new Reporter(factory, parser);
 
 		final TestCaseResult testCase_1 = context.mock(TestCaseResult.class, "firstCase");
 		final TestCaseResult testCase_2 = context.mock(TestCaseResult.class, "secondCase");
@@ -43,14 +45,14 @@ public class TestStatusReporter {
 			}
 		});
 		
-		testStatusUpdater.reportTestResult();
+		testStatusUpdater.reportTestResult(testDashBoard, testResultStream);
 		context.assertIsSatisfied();
 	}
 	
 	@Test
 	public void testInfoMoreThanTwoLines(){
 		InputStream testResultStream = buildTestResultStream("line1 \nline2 ");
-		Reporter testStatusUpdater = new Reporter(testDashBoard, testResultStream, factory);
+		Reporter testStatusUpdater = new Reporter(factory, parser);
 		final TestCaseResult testCase = context.mock(TestCaseResult.class, "firstCase");
 		
 		context.checking(new Expectations(){
@@ -59,7 +61,7 @@ public class TestStatusReporter {
 				will(returnValue(testCase));
 				oneOf(testCase).needMoreInfo();
 				will(returnValue(true));
-				oneOf(testCase).addMoreInfo("line2 ");
+				oneOf(testCase).parseAdditionalLine(with(equal("line2 ")), with(any(CppUTestOutputParser.class)));
 				oneOf(testCase).needMoreInfo();
 				will(returnValue(false));
 				oneOf(testCase).putTo(testDashBoard);
@@ -67,7 +69,7 @@ public class TestStatusReporter {
 			}
 		});
 		
-		testStatusUpdater.reportTestResult();
+		testStatusUpdater.reportTestResult(testDashBoard, testResultStream);
 		context.assertIsSatisfied();
 		
 	}

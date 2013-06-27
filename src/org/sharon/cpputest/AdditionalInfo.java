@@ -12,8 +12,6 @@ public class AdditionalInfo {
 
 	private ArrayList<String> details = new ArrayList<String>();
 	private boolean testInfoComplete;
-	
-	private CppUTestOutputParser parser = new CppUTestOutputParser();
 
 	public void done() {
 		testInfoComplete = true;
@@ -28,9 +26,9 @@ public class AdditionalInfo {
 		putDetailedInfo(dashBoard);
 	}
 
-	public void add(String line) {
+	public void parseLine(String line, CppUTestOutputParser parser) {
 		if (parser.containsErrorInfo(line))
-			getGeneralError(line);
+			getGeneralError(line, parser);
 		else
 			getDetails(line);
 	}
@@ -50,7 +48,7 @@ public class AdditionalInfo {
 		details.add(line);
 	}
 
-	private void getGeneralError(String line) {
+	private void getGeneralError(String line, CppUTestOutputParser parser) {
 		fileName = parser.extractFileName(line);
 		lineNumber = parser.extractLineNumber(line);
 		generalError = parser.extractError(line);

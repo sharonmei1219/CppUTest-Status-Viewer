@@ -19,8 +19,9 @@ public class TestProvider implements ITestsRunnerProvider {
 	@Override
 	public void run(ITestModelUpdater dashBoard, InputStream testResultInStream)
 			throws TestingException {
-		TestCaseFactory factory = new TestCaseFactoryImp();
-		Reporter reporter = new Reporter(dashBoard, testResultInStream, factory);
-		reporter.reportTestResult();
+		CppUTestOutputParser parser = new CppUTestOutputParser();
+		TestCaseFactoryImp tcResultFactory = new TestCaseFactoryImp(parser);
+		Reporter reporter = new Reporter(tcResultFactory, parser);
+		reporter.reportTestResult(dashBoard, testResultInStream);
 	}
 }

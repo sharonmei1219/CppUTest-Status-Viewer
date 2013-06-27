@@ -37,5 +37,4 @@ public class CppUTestOutputParser {
 	public String extractFileName(String errorInfo) {
 		return errorInfo.replaceAll(ErrorInfoPattern, "$1");
 	}
-
 }

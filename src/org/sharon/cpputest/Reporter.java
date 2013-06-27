@@ -10,29 +10,27 @@ import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 
 public class Reporter {
 
-	private InputStream testResultStream;
-	private ITestModelUpdater testDashBoard;
 	private TestCaseFactory testCaseFactory;
+	private CppUTestOutputParser parser;
 
-	public Reporter(ITestModelUpdater unitTestDashBoard, InputStream testResultStreamFromConsole, TestCaseFactory factory) {
+	public Reporter(TestCaseFactory factory, CppUTestOutputParser parser) {
 		this.testCaseFactory = factory;
-		this.testResultStream = testResultStreamFromConsole;
-		this.testDashBoard = unitTestDashBoard;
+		this.parser = parser;
 	}
 
-	public void reportTestResult() {
-
-		InputStreamReader streamReader = new InputStreamReader(testResultStream);
+	public void reportTestResult(ITestModelUpdater dashBoard, InputStream testResultOutputStream) {
+		InputStreamReader streamReader = new InputStreamReader(testResultOutputStream);
 		BufferedReader reader = new BufferedReader(streamReader);
+
         String line;
         
         try {
 			while ( ( line = reader.readLine() ) != null ) {
 				TestCaseResult tcResult = testCaseFactory.createTestCase(line);
 				while( (tcResult.needMoreInfo()) && (line = reader.readLine()) != null){
-					tcResult.addMoreInfo(line);
+					tcResult.parseAdditionalLine(line, parser);
 				}
-				tcResult.putTo(testDashBoard);
+				tcResult.putTo(dashBoard);
 			}
 		} catch (IOException e) {
 			e.printStackTrace();

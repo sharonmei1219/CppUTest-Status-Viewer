@@ -9,13 +9,14 @@ public class TestCaseResultImp implements TestCaseResult {
 	private int testingTime = 0;
 	private ITestItem.Status testingStatus = ITestItem.Status.Passed;;
 
-	private AdditionalInfo extraInfo = new AdditionalInfo();
-	private CppUTestOutputParser parser = new CppUTestOutputParser();
+	private AdditionalInfo additionalInfo = new AdditionalInfo();
+	private CppUTestOutputParser parser;
 
-	public TestCaseResultImp(String line) {
+	public TestCaseResultImp(String line, CppUTestOutputParser parser) {
+		this.parser = parser;
 		testCaseName = parser.extractTestCaseName(line);
 		if(parser.containsTestingTime(line)){
-			extraInfo.done();
+			additionalInfo.done();
 			testingTime = parser.extractTestingTime(line);
 		}
 	}
@@ -24,7 +25,7 @@ public class TestCaseResultImp implements TestCaseResult {
 		dashBoard.enterTestCase(testCaseName);
 		dashBoard.setTestStatus(testingStatus);
 		if (testingStatus == ITestItem.Status.Failed) {
-			extraInfo.putTo(dashBoard);
+			additionalInfo.putTo(dashBoard);
 		}
 		dashBoard.setTestingTime(testingTime);
 		dashBoard.exitTestCase();
@@ -32,18 +33,18 @@ public class TestCaseResultImp implements TestCaseResult {
 
 	@Override
 	public boolean needMoreInfo() {
-		return !extraInfo.isDone();
+		return !additionalInfo.isDone();
 	}
 
 	@Override
-	public void addMoreInfo(String line) {
+	public void parseAdditionalLine(String line, CppUTestOutputParser parser) {
 		testingStatus = ITestItem.Status.Failed;
 		
 		if (parser.containsTestingTime(line)){
-			extraInfo.done();
+			additionalInfo.done();
 			testingTime = parser.extractTestingTime(line);
 		}
 		else
-			extraInfo.add(line);
+			additionalInfo.parseLine(line, parser);
 	}
 }

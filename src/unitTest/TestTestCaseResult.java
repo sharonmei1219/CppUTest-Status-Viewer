@@ -7,6 +7,7 @@ import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.sharon.cpputest.CppUTestOutputParser;
 import org.sharon.cpputest.TestCaseFactory;
 import org.sharon.cpputest.TestCaseFactoryImp;
 import org.sharon.cpputest.TestCaseResult;
@@ -17,11 +18,12 @@ public class TestTestCaseResult {
 	String lineOfSuccCase = "TEST(TestSuite, TestSucc) - 3 ms";
 	String beginningLineOfFailedCase = "TEST(TestSuite, TestFail)";
 	final ITestModelUpdater updater = context.mock(ITestModelUpdater.class);
+	CppUTestOutputParser parser = new CppUTestOutputParser();
 
 	@Test
 	public void testTestCaseResultReporting() {
 		
-		TestCaseResult testCaseResult = new TestCaseResultImp(lineOfSuccCase);
+		TestCaseResult testCaseResult = new TestCaseResultImp(lineOfSuccCase, parser);
 		
 		context.checking(new Expectations(){
 			{
@@ -38,33 +40,33 @@ public class TestTestCaseResult {
 	
 	@Test
 	public void testTestCaseInfoComplete(){
-		TestCaseResult testResult = new TestCaseResultImp(lineOfSuccCase);
+		TestCaseResult testResult = new TestCaseResultImp(lineOfSuccCase, parser);
 		assertFalse(testResult.needMoreInfo());
 	}
 	
 	@Test
 	public void testTestCaseInfoImcomplete(){
-		TestCaseResult testResult = new TestCaseResultImp(beginningLineOfFailedCase);
+		TestCaseResult testResult = new TestCaseResultImp(beginningLineOfFailedCase, parser);
 		assertTrue(testResult.needMoreInfo());
 	}
 	
 	@Test
 	public void testSupplyMoreInfoToCompleteTestCase(){
-		TestCaseResult testResult = new TestCaseResultImp(beginningLineOfFailedCase);
-		testResult.addMoreInfo("no implementation");
+		TestCaseResult testResult = new TestCaseResultImp(beginningLineOfFailedCase, parser);
+		testResult.parseAdditionalLine("no implementation", parser);
 		assertTrue(testResult.needMoreInfo());
-		testResult.addMoreInfo(" - 5 ms");
+		testResult.parseAdditionalLine(" - 5 ms", parser);
 		assertFalse(testResult.needMoreInfo());
 	}
 	
 	@Test
 	public void testReportFailedTestCase(){
 		
-		TestCaseResult testCaseResult = new TestCaseResultImp(beginningLineOfFailedCase);
+		TestCaseResult testCaseResult = new TestCaseResultImp(beginningLineOfFailedCase, parser);
 		final String errorInfo = "test/testTimer.cpp:40: error: Failure in TEST(TestTimer, testTimerExpired)";
 		final String fileName = "test/testTimer.cpp";
-		testCaseResult.addMoreInfo(errorInfo);
-		testCaseResult.addMoreInfo(" - 5 ms");
+		testCaseResult.parseAdditionalLine(errorInfo, parser);
+		testCaseResult.parseAdditionalLine(" - 5 ms", parser);
 		context.checking(new Expectations(){
 			{
 				oneOf(updater).enterTestCase("TestFail");

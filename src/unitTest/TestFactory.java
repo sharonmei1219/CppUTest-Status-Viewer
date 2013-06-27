@@ -3,6 +3,7 @@ package unitTest;
 import static org.junit.Assert.*;
 
 import org.junit.Test;
+import org.sharon.cpputest.CppUTestOutputParser;
 import org.sharon.cpputest.NullTestCaseResult;
 import org.sharon.cpputest.TestCaseFactory;
 import org.sharon.cpputest.TestCaseFactoryImp;
@@ -10,7 +11,8 @@ import org.sharon.cpputest.TestCaseResult;
 import org.sharon.cpputest.TestCaseResultImp;
 
 public class TestFactory {
-	TestCaseFactory factory = new TestCaseFactoryImp();
+	CppUTestOutputParser parser = new CppUTestOutputParser();
+	TestCaseFactory factory = new TestCaseFactoryImp(parser);
 
 	@Test
 	public void createNormalTestResult() {
