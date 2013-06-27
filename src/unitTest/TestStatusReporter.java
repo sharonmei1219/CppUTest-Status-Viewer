@@ -59,7 +59,7 @@ public class TestStatusReporter {
 				will(returnValue(testCase));
 				oneOf(testCase).needMoreInfo();
 				will(returnValue(true));
-				oneOf(testCase).read("line2 ");
+				oneOf(testCase).addMoreInfo("line2 ");
 				oneOf(testCase).needMoreInfo();
 				will(returnValue(false));
 				oneOf(testCase).putTo(testDashBoard);

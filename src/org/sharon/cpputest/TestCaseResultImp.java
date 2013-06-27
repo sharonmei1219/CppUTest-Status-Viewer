@@ -6,17 +6,17 @@ import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 public class TestCaseResultImp implements TestCaseResult {
 
 	private String testCaseName;
-	private int testingTime;
-	private ITestItem.Status testingStatus;
+	private int testingTime = 0;
+	private ITestItem.Status testingStatus = ITestItem.Status.Passed;;
 
-	private ExtraInfo extraInfo = new ExtraInfo();
+	private AdditionalInfo extraInfo = new AdditionalInfo();
 
 	public TestCaseResultImp(String line) {
-		testingStatus = ITestItem.Status.Passed;
 		testCaseName = extractTestCaseName(line);
-		if(isCaseInfoComplete(line))
+		if(isCaseInfoComplete(line)){
 			extraInfo.done();
-		testingTime = extractTestingTime(line);
+			testingTime = extractTestingTime(line);
+		}
 	}
 
 	public void putTo(ITestModelUpdater dashBoard) {
@@ -35,7 +35,7 @@ public class TestCaseResultImp implements TestCaseResult {
 	}
 
 	@Override
-	public void read(String line) {
+	public void addMoreInfo(String line) {
 		testingStatus = ITestItem.Status.Failed;
 		if (isCaseInfoComplete(line))
 			extraInfo.done();

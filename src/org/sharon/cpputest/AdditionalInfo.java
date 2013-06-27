@@ -4,13 +4,14 @@ import java.util.ArrayList;
 import org.eclipse.cdt.testsrunner.model.ITestMessage;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
 
-public class ExtraInfo {
+public class AdditionalInfo {
 
-	private boolean testInfoComplete;
-	private ArrayList<String> details = new ArrayList<String>();
 	private String generalError;
 	private String fileName;
 	private int lineNumber;
+
+	private ArrayList<String> details = new ArrayList<String>();
+	private boolean testInfoComplete;
 
 	public void done() {
 		testInfoComplete = true;
@@ -32,10 +33,6 @@ public class ExtraInfo {
 			getDetails(line);
 	}
 
-	private boolean containsErrorInfo(String line) {
-		return line.matches("(.*)(:)([0-9]*)(: error:.*)");
-	}
-
 	private void putGeneralError(ITestModelUpdater dashBoard) {
 		dashBoard.addTestMessage(fileName, lineNumber,
 				ITestMessage.Level.Error, generalError);
@@ -55,6 +52,10 @@ public class ExtraInfo {
 		fileName = extractFileName(line);
 		lineNumber = extractLineNumber(line);
 		generalError = extractError(line);
+	}
+
+	private boolean containsErrorInfo(String line) {
+		return line.matches("(.*)(:)([0-9]*)(: error:.*)");
 	}
 
 	private String extractError(String errorInfo) {

@@ -51,9 +51,9 @@ public class TestTestCaseResult {
 	@Test
 	public void testSupplyMoreInfoToCompleteTestCase(){
 		TestCaseResult testResult = new TestCaseResultImp(beginningLineOfFailedCase);
-		testResult.read("no implementation");
+		testResult.addMoreInfo("no implementation");
 		assertTrue(testResult.needMoreInfo());
-		testResult.read(" - 5 ms");
+		testResult.addMoreInfo(" - 5 ms");
 		assertFalse(testResult.needMoreInfo());
 	}
 	
@@ -63,8 +63,8 @@ public class TestTestCaseResult {
 		TestCaseResult testCaseResult = new TestCaseResultImp(beginningLineOfFailedCase);
 		final String errorInfo = "test/testTimer.cpp:40: error: Failure in TEST(TestTimer, testTimerExpired)";
 		final String fileName = "test/testTimer.cpp";
-		testCaseResult.read(errorInfo);
-		testCaseResult.read(" - 5 ms");
+		testCaseResult.addMoreInfo(errorInfo);
+		testCaseResult.addMoreInfo(" - 5 ms");
 		context.checking(new Expectations(){
 			{
 				oneOf(updater).enterTestCase("TestFail");

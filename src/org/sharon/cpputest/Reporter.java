@@ -30,7 +30,7 @@ public class Reporter {
 			while ( ( line = reader.readLine() ) != null ) {
 				TestCaseResult tcResult = testCaseFactory.createTestCase(line);
 				while( (tcResult.needMoreInfo()) && (line = reader.readLine()) != null){
-					tcResult.read(line);
+					tcResult.addMoreInfo(line);
 				}
 				tcResult.putTo(testDashBoard);
 			}

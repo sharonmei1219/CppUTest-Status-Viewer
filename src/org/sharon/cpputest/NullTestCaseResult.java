@@ -14,7 +14,7 @@ public class NullTestCaseResult implements TestCaseResult {
 	}
 
 	@Override
-	public void read(String string) {
+	public void addMoreInfo(String string) {
 	}
 
 }
