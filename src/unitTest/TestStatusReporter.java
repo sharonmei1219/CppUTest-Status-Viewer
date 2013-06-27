@@ -14,6 +14,7 @@ import org.sharon.cpputest.TestCaseFactory;
 import org.sharon.cpputest.TestCaseResult;
 import org.eclipse.cdt.testsrunner.model.ITestItem;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
+import org.eclipse.cdt.testsrunner.model.ITestSuite;
 public class TestStatusReporter {
 	
 	Mockery context = new Mockery();
@@ -33,15 +34,22 @@ public class TestStatusReporter {
 			{
 				oneOf(factory).createTestCase("TEST(testSuite, testCase1),... "); 
 				will(returnValue(testCase_1));
+				oneOf(testCase_1).testSuite();
+				will(returnValue("TestSuite1"));
+				oneOf(testDashBoard).enterTestSuite("TestSuite1");
 				oneOf(testCase_1).needMoreInfo();
 				will(returnValue(false));
 				oneOf(testCase_1).putTo(testDashBoard);
-				
 				oneOf(factory).createTestCase("TEST(testSuite, testCase2)..."); 
 				will(returnValue(testCase_2));
+				oneOf(testCase_2).testSuite();
+				will(returnValue("TestSuite2"));
+				oneOf(testDashBoard).exitTestSuite();
+				oneOf(testDashBoard).enterTestSuite("TestSuite2");
 				oneOf(testCase_2).needMoreInfo();
 				will(returnValue(false));
 				oneOf(testCase_2).putTo(testDashBoard);
+				oneOf(testDashBoard).exitTestSuite();
 			}
 		});
 		
@@ -59,13 +67,16 @@ public class TestStatusReporter {
 			{
 				oneOf(factory).createTestCase("line1 "); 
 				will(returnValue(testCase));
+				oneOf(testCase).testSuite();
+				will(returnValue("TestSuite1"));
+				oneOf(testDashBoard).enterTestSuite("TestSuite1");
 				oneOf(testCase).needMoreInfo();
 				will(returnValue(true));
 				oneOf(testCase).parseAdditionalLine(with(equal("line2 ")), with(any(CppUTestOutputParser.class)));
 				oneOf(testCase).needMoreInfo();
 				will(returnValue(false));
 				oneOf(testCase).putTo(testDashBoard);
-				
+				oneOf(testDashBoard).exitTestSuite();
 			}
 		});
 		

@@ -1,6 +1,7 @@
 package org.sharon.cpputest;
 
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
+import org.eclipse.cdt.testsrunner.model.ITestSuite;
 
 public class NullTestCaseResult implements TestCaseResult {
 
@@ -15,6 +16,16 @@ public class NullTestCaseResult implements TestCaseResult {
 
 	@Override
 	public void parseAdditionalLine(String string, CppUTestOutputParser parser) {
+	}
+
+	@Override
+	public boolean inTheSameSuiteWith(ITestSuite currentTestSuite) {
+		return true;
+	}
+
+	@Override
+	public String testSuite() {
+		return null;
 	}
 
 }

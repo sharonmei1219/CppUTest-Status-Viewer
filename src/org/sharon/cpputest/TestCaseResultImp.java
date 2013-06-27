@@ -2,23 +2,26 @@ package org.sharon.cpputest;
 
 import org.eclipse.cdt.testsrunner.model.ITestItem;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
+import org.eclipse.cdt.testsrunner.model.ITestSuite;
 
 public class TestCaseResultImp implements TestCaseResult {
 
 	private String testCaseName;
+	private String testSuiteName;
 	private int testingTime = 0;
 	private ITestItem.Status testingStatus = ITestItem.Status.Passed;;
 
 	private AdditionalInfo additionalInfo = new AdditionalInfo();
-	private CppUTestOutputParser parser;
 
 	public TestCaseResultImp(String line, CppUTestOutputParser parser) {
-		this.parser = parser;
 		testCaseName = parser.extractTestCaseName(line);
-		if(parser.containsTestingTime(line)){
+		testSuiteName = parser.extractTestSuiteName(line);
+		if(endOfTestCaseInfo(line, parser)){
 			additionalInfo.done();
 			testingTime = parser.extractTestingTime(line);
 		}
+		if(parser.isTestCaseIgnored(line))
+			testingStatus = ITestItem.Status.Skipped;
 	}
 
 	public void putTo(ITestModelUpdater dashBoard) {
@@ -38,13 +41,28 @@ public class TestCaseResultImp implements TestCaseResult {
 
 	@Override
 	public void parseAdditionalLine(String line, CppUTestOutputParser parser) {
-		testingStatus = ITestItem.Status.Failed;
+		if (parser.containsErrorInfo(line))
+			testingStatus = ITestItem.Status.Failed;
 		
-		if (parser.containsTestingTime(line)){
+		if (endOfTestCaseInfo(line, parser)){
 			additionalInfo.done();
 			testingTime = parser.extractTestingTime(line);
 		}
 		else
 			additionalInfo.parseLine(line, parser);
+	}
+
+	private boolean endOfTestCaseInfo(String line, CppUTestOutputParser parser) {
+		return parser.containsTestingTime(line);
+	}
+
+	@Override
+	public boolean inTheSameSuiteWith(ITestSuite testSuite) {
+		return testSuiteName.equals(testSuite.getName());
+	}
+
+	@Override
+	public String testSuite() {
+		return testSuiteName;
 	}
 }

@@ -9,6 +9,10 @@ public class CppUTestOutputParser {
 	public String extractTestCaseName(String line) {
 		return line.replaceAll(TestCaseTitlePattern, "$5");
 	}
+	
+	public String extractTestSuiteName(String line) {
+		return line.replaceAll(TestCaseTitlePattern, "$3");
+	}
 
 	boolean cotainsTestCaseName(String line) {
 		return line.matches(TestCaseTitlePattern);
@@ -37,4 +41,11 @@ public class CppUTestOutputParser {
 	public String extractFileName(String errorInfo) {
 		return errorInfo.replaceAll(ErrorInfoPattern, "$1");
 	}
+
+	public boolean isTestCaseIgnored(String string) {
+		String pattern = "IGNORE_TEST.*";
+		return string.matches(pattern);
+	}
+
+
 }

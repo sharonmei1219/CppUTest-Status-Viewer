@@ -4,6 +4,8 @@ import org.jmock.*;
 import org.eclipse.cdt.testsrunner.model.ITestItem;
 import org.eclipse.cdt.testsrunner.model.ITestMessage;
 import org.eclipse.cdt.testsrunner.model.ITestModelUpdater;
+import org.eclipse.cdt.testsrunner.model.ITestSuite;
+
 import static org.junit.Assert.*;
 
 import org.junit.Test;
@@ -29,6 +31,24 @@ public class TestTestCaseResult {
 			{
 				oneOf(updater).enterTestCase("TestSucc");
 				oneOf(updater).setTestStatus(ITestItem.Status.Passed);
+				oneOf(updater).setTestingTime(3);
+				oneOf(updater).exitTestCase();
+			}
+		});
+		
+		testCaseResult.putTo(updater);
+		context.assertIsSatisfied();
+	}
+	
+	@Test
+	public void testUpdateTestInfoForIgnoringTest() {
+		
+		TestCaseResult testCaseResult = new TestCaseResultImp("IGNORE_TEST(testSuite, testCase) - 3 ms", parser);
+		
+		context.checking(new Expectations(){
+			{
+				oneOf(updater).enterTestCase("testCase");
+				oneOf(updater).setTestStatus(ITestItem.Status.Skipped);
 				oneOf(updater).setTestingTime(3);
 				oneOf(updater).exitTestCase();
 			}
@@ -95,5 +115,19 @@ public class TestTestCaseResult {
 		String neatFileName = splitedName[splitedName.length-1];
 		assertEquals(neatFileName, "testTimer.cpp");
 		
+	}
+	
+	@Test
+	public void testInTheSameTestSuite(){
+		final ITestSuite testSuite = context.mock(ITestSuite.class);
+		TestCaseResult testCaseResult = new TestCaseResultImp("TEST(TestSuite1, TestCase1) xxx", parser);
+		context.checking(new Expectations(){
+			{
+				oneOf(testSuite).getName();
+				will(returnValue("TestSuite1"));
+			}
+		});
+		assertTrue(testCaseResult.inTheSameSuiteWith(testSuite));
+		context.assertIsSatisfied();
 	}
 }
