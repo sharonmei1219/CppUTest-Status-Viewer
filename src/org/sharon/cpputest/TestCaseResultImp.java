@@ -10,12 +10,13 @@ public class TestCaseResultImp implements TestCaseResult {
 	private ITestItem.Status testingStatus = ITestItem.Status.Passed;;
 
 	private AdditionalInfo extraInfo = new AdditionalInfo();
+	private CppUTestOutputParser parser = new CppUTestOutputParser();
 
 	public TestCaseResultImp(String line) {
-		testCaseName = extractTestCaseName(line);
-		if(isCaseInfoComplete(line)){
+		testCaseName = parser.extractTestCaseName(line);
+		if(parser.containsTestingTime(line)){
 			extraInfo.done();
-			testingTime = extractTestingTime(line);
+			testingTime = parser.extractTestingTime(line);
 		}
 	}
 
@@ -37,31 +38,12 @@ public class TestCaseResultImp implements TestCaseResult {
 	@Override
 	public void addMoreInfo(String line) {
 		testingStatus = ITestItem.Status.Failed;
-		if (isCaseInfoComplete(line))
+		
+		if (parser.containsTestingTime(line)){
 			extraInfo.done();
-
-		if (!extraInfo.isDone())
-			extraInfo.add(line);
-		else
-			testingTime = extractTestingTime(line);
-	}
-
-
-	private int extractTestingTime(String line) {
-		String pattern = "(.*)( - )(.*)( ms)$";
-		if (line.matches(pattern)) {
-			return Integer.parseInt(line.replaceAll(pattern, "$3"));
+			testingTime = parser.extractTestingTime(line);
 		}
-		return -1;
-	}
-
-	private String extractTestCaseName(String line) {
-		String pattern = "(.*)(TEST\\()(.*)(, )(.*)(\\))(.*)";
-		return line.replaceAll(pattern, "$5");
-	}
-
-	private boolean isCaseInfoComplete(String line) {
-		String pattern = "(.*)( - )(.*)( ms)$";
-		return line.matches(pattern);
+		else
+			extraInfo.add(line);
 	}
 }

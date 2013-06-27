@@ -12,6 +12,8 @@ public class AdditionalInfo {
 
 	private ArrayList<String> details = new ArrayList<String>();
 	private boolean testInfoComplete;
+	
+	private CppUTestOutputParser parser = new CppUTestOutputParser();
 
 	public void done() {
 		testInfoComplete = true;
@@ -27,7 +29,7 @@ public class AdditionalInfo {
 	}
 
 	public void add(String line) {
-		if (containsErrorInfo(line))
+		if (parser.containsErrorInfo(line))
 			getGeneralError(line);
 		else
 			getDetails(line);
@@ -49,27 +51,8 @@ public class AdditionalInfo {
 	}
 
 	private void getGeneralError(String line) {
-		fileName = extractFileName(line);
-		lineNumber = extractLineNumber(line);
-		generalError = extractError(line);
-	}
-
-	private boolean containsErrorInfo(String line) {
-		return line.matches("(.*)(:)([0-9]*)(: error:.*)");
-	}
-
-	private String extractError(String errorInfo) {
-		String pattern = "(.*)(:)([0-9]*)(: error:)(.*)";
-		return errorInfo.replaceAll(pattern, "$5");
-	}
-
-	private int extractLineNumber(String errorInfo) {
-		String pattern = "(.*)(:)([0-9]*)(: error:.*)";
-		return Integer.parseInt(errorInfo.replaceAll(pattern, "$3"));
-	}
-
-	private String extractFileName(String errorInfo) {
-		String pattern = "(.*)(:)([0-9]*)(: error:.*)";
-		return errorInfo.replaceAll(pattern, "$1");
+		fileName = parser.extractFileName(line);
+		lineNumber = parser.extractLineNumber(line);
+		generalError = parser.extractError(line);
 	}
 }
