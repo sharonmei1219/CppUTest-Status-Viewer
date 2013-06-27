@@ -69,7 +69,7 @@ public class TestTestCaseResult {
 			{
 				oneOf(updater).enterTestCase("TestFail");
 				oneOf(updater).setTestStatus(ITestItem.Status.Failed);
-				oneOf(updater).addTestMessage(fileName, 40, ITestMessage.Level.Error, errorInfo);
+				oneOf(updater).addTestMessage(fileName, 40, ITestMessage.Level.Error, " Failure in TEST(TestTimer, testTimerExpired)");
 				oneOf(updater).setTestingTime(5);
 				oneOf(updater).exitTestCase();
 			}
